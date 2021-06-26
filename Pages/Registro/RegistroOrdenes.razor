@@ -1,0 +1,88 @@
+﻿@page "/registrocompras"
+@using SegundoRegistroDetalle.BLL
+@using SegundoRegistroDetalle.Models
+<h3>Registro de Ordenes</h3>
+<div class="container-fluid">
+    <EditForm Model="orden" OnValidSubmit="Guardar">
+        <div class="form-group">
+            <label>Id</label>
+            <div class="input-group">
+                <InputNumber @bind-Value="orden.OrdenId" class="form-control" />
+                <div class="input-group-append">
+                    <button type="button" class="btn btn-primary" @onclick="Buscar">Buscar</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="form-group">
+            <label>Fecha</label>
+            <InputDate @bind-Value="orden.Fecha" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label>Suplidor</label>
+            <select>
+                <option value="-1">--select--</option>
+                @foreach (var item in suplidores)
+                {
+                    <option value="@item.SuplidorId">@item.Nombres</option>
+                }
+            </select>
+        </div>
+        <div class="table-responsive ">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="row">Id</th>
+                        <th scope="row">Producto</th>
+                        <th scope="row">Precio</th>
+                        <th scope="row">Cantidad</th>
+                        <th scope="row">Importe</th>
+                        <th></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var obj in orden.Detalle)
+                    {
+                    <tr>
+                        <td>@obj.OrdenId</td>
+                        <td>@obj.ProductoId</td>
+                        <td>@obj.Costo</td>
+                        <td>@obj.Cantidad</td>
+                        <td>@obj.SubTotal</td>
+                        <td><button type="button" class="btn btn-sm btn-danger " @onclick="(()=> Remover(obj))">Eliminar</button></td>
+                    </tr>
+                    }
+
+                </tbody>
+
+            </table>
+        </div>
+
+
+    </EditForm>
+</div>
+
+@code {
+    public List<Suplidores> suplidores = OrdenesBLL.GetSuplidores();
+    public Ordenes orden = new Ordenes();
+    public void Limpiar() { }
+    public void Nuevo() { }
+    public void Guardar() { }
+    public void Buscar() { }
+    public void Eliminar() { }
+
+    public void Remover(OrdenesDetalle dr)
+    {
+        orden.Detalle.Remove(dr);
+        CalcularTotal();
+    }
+
+    private void CalcularTotal()
+    {
+        orden.Monto = orden.Detalle.Sum(p => p.SubTotal);
+
+    }
+
+}
